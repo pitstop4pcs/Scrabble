@@ -168,7 +168,9 @@ class Game:
                 if pygame.key.name(key).strip("[]").isnumeric() or pygame.key.name(key).strip("[]") == ".":
                     self.host_ip += pygame.key.name(key).strip("[]")
                     self.display_update()
-                if key == pygame.K_ESCAPE or key == pygame.K_BACKSPACE:
+                if key == pygame.K_BACKSPACE:
+                    self.host_ip = self.host_ip[:-1]
+                if key == pygame.K_ESCAPE:
                     self.host_ip = ""
                 if key == pygame.K_RETURN or key == pygame.K_KP_ENTER:
                     self.connect_to_host()
@@ -369,7 +371,14 @@ class Game:
     def connect_to_host(self):
         self.role = "client"
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client.connect((self.host_ip, 9999))
+        self.client.settimeout(6)
+        try:
+            self.client.connect((self.host_ip, 9999))
+        except Exception as e:
+            print(e)
+            self.host_ip = ""
+            return
+
         threading.Thread(target=self.receive_moves, args=(self.client,), daemon=True).start()
         self.establishing_connection = False
         self.distributing = True
