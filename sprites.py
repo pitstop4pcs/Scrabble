@@ -6,6 +6,8 @@ pygame.init()
 FONT = pygame.font.Font(resource_path("fonts/Scramble-KVBe.ttf"), 49)
 FONT2 = pygame.font.Font(resource_path("fonts/InterstateBold.otf"), 40)
 
+TILERACK_SLOTS = []
+
 class Square(pygame.sprite.Sprite):
     def __init__(self, x, y, colour):
         super().__init__()
@@ -31,6 +33,7 @@ class Square(pygame.sprite.Sprite):
 class TileRackSlot(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
+        TILERACK_SLOTS.append((x,y))
         self.image = pygame.Surface((TILE_SIZE, TILE_SIZE))
         self.rect = self.image.get_rect(topleft=(x, y))
         self.image.fill("lightgoldenrod")

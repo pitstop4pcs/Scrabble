@@ -152,6 +152,15 @@ class Game:
             self.swap_area_tooltip = True
         else:
             self.swap_area_tooltip = False
+        if self.tile_in_hand:
+            for tile in self.tiles_on_rack:
+                if tile.rect.collidepoint(pos):
+                    slots = TILERACK_SLOTS.copy()
+                    slots.remove(tile.rect.topleft)
+                    rack_tiles = sorted(self.tiles_on_rack, key=lambda e: e.rect.x)
+                    for i, t in enumerate(rack_tiles):
+                        t.rect.topleft = slots[i]
+                    return
 
     def key_press(self, key):
         if self.establishing_connection:
@@ -916,4 +925,5 @@ class Game:
 
 if __name__ == '__main__':
     game = Game()
+    print(TILERACK_SLOTS)
     game.run()
