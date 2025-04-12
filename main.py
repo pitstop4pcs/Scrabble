@@ -440,7 +440,7 @@ class Game:
             return
         for square in self.gameboard_squares:
             if square.rect.collidepoint(pos):
-                if pygame.sprite.spritecollideany(square, self.tiles_played):
+                if pygame.sprite.spritecollideany(square, self.tiles_played) or pygame.sprite.spritecollideany(square, self.tiles_on_board):
                     break
                 tile = self.tile_in_hand.sprite
                 tile.update(square.rect.center)
@@ -925,5 +925,4 @@ class Game:
 
 if __name__ == '__main__':
     game = Game()
-    print(TILERACK_SLOTS)
     game.run()
