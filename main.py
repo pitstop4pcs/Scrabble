@@ -371,7 +371,6 @@ class Game:
     def connect_to_host(self):
         self.role = "client"
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client.settimeout(6)
         try:
             self.client.connect((self.host_ip, 9999))
         except Exception as e:
