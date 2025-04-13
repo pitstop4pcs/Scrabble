@@ -33,9 +33,17 @@ class Game:
         self.host_join_buttons = {}
 
         self.tilerack = pygame.Surface((TILE_SIZE * 8, TILE_SIZE * 1.5))
-        self.tilerack_rect = self.tilerack.get_rect(topleft=(TILE_SIZE * 18, TILE_SIZE * 13.5))
+        self.tilerack_rect = self.tilerack.get_rect(topleft=(TILE_SIZE * 16.5, TILE_SIZE * 13.5))
         self.tilerack.fill("lightgoldenrod")
         pygame.draw.rect(self.tilerack, "black", (0, 0, TILE_SIZE * 8, TILE_SIZE * 1.5), 1)
+
+        self.shuffle_button = pygame.Surface((TILE_SIZE * 2.5, TILE_SIZE), pygame.SRCALPHA, 32).convert_alpha()
+        self.shuffle_button_rect = self.shuffle_button.get_rect(topleft=(TILE_SIZE * 25, TILE_SIZE * 13.75))
+        pygame.draw.rect(self.shuffle_button, "black", (0, 0, TILE_SIZE * 2.5, TILE_SIZE), 0, 10)
+        text = self.small_font.render("SHUFFLE", True, "white")
+        text_rect = text.get_rect(center=(self.shuffle_button.get_width()//2, self.shuffle_button.get_height()//2))
+        self.shuffle_button.blit(text, text_rect)
+
         self.tiles_on_rack = pygame.sprite.Group()
         self.tilerack_slots = pygame.sprite.Group()
         for i in range(7):
@@ -146,6 +154,12 @@ class Game:
 
         pygame.quit()
         psutil.Process(os.getpid()).terminate()
+
+    def shuffle(self):
+        positions = TILERACK_SLOTS[:]
+        random.shuffle(positions)
+        for tile in self.tiles_on_rack:
+            tile.rect.topleft = positions.pop()
 
     def mouse_over(self, pos):
         if self.swap_area_rect.collidepoint(pos):
@@ -333,7 +347,7 @@ class Game:
         for i, r in enumerate(result.split("\n")):
             if "default gateway" in r:
                 if r.split(":")[1].strip():
-                    return result.split("\n")[i-2].split(":")[1].strip()
+                    return result.split("\n")[i - 2].split(":")[1].strip()
 
     def receive_moves(self, conn):
         while True:
@@ -435,6 +449,9 @@ class Game:
                 self.gameboard_squares.update(self.current_arrow)
                 return
 
+        if self.shuffle_button_rect.collidepoint(pos):
+            self.shuffle()
+
     def mouse_release(self, pos):
         if self.swap_area_rect.collidepoint(pos):
             tile = self.tile_in_hand.sprite
@@ -448,7 +465,8 @@ class Game:
             return
         for square in self.gameboard_squares:
             if square.rect.collidepoint(pos):
-                if pygame.sprite.spritecollideany(square, self.tiles_played) or pygame.sprite.spritecollideany(square, self.tiles_on_board):
+                if pygame.sprite.spritecollideany(square, self.tiles_played) or pygame.sprite.spritecollideany(square,
+                                                                                                               self.tiles_on_board):
                     break
                 tile = self.tile_in_hand.sprite
                 tile.update(square.rect.center)
@@ -911,6 +929,7 @@ class Game:
             self.screen.blit(self.swap_area, self.swap_area_rect)
 
             self.screen.blit(self.tilerack, self.tilerack_rect)
+            self.screen.blit(self.shuffle_button, self.shuffle_button_rect)
 
             self.gameboard_squares.draw(self.screen)
             self.tilerack_slots.draw(self.screen)
